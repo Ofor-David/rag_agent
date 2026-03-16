@@ -131,12 +131,14 @@ Departmental data such as:
 - Project clearance requirements
 - Extra-year procedures
 
-Data is structured in **CSV or JSON format**:
+Data is structured in **JSON format**:
 
-```
-question,answer,category
-"What are final year requirements?","You must complete...","Graduation"
-"How do I process clearance?","Visit the departmental office...","Clearance"
+```json
+  {
+    "question": "Where do I submit clearance documents?",
+    "answer": "Departmental academic office or designated submission point.",
+    "context": "Clearance"
+  },
 ```
 
 ---
@@ -157,7 +159,7 @@ The dataset is cleaned and prepared by:
 Text embeddings are generated using:
 
 ```
-text-embedding-ada-002
+gemini-embedding-001
 ```
 
 Embeddings convert text into **numeric vectors** that capture semantic meaning.
@@ -166,12 +168,7 @@ Embeddings convert text into **numeric vectors** that capture semantic meaning.
 
 ## 4. Vector Storage
 
-Embeddings are stored in a **vector database** such as:
-
-- ChromaDB
-- Supabase pgvector
-- Qdrant
-- FAISS
+Embeddings are stored in ChromaDB
 
 This enables **semantic similarity search**.
 
@@ -189,10 +186,7 @@ When a student submits a question:
 
 ## 6. Answer Generation
 
-The retrieved context is passed to a language model such as:
-
-- GPT-3.5 Turbo
-- Gemini 1.5 Flash
+The retrieved context is passed to Gemini 2.0 Flash
 
 The LLM generates an answer **based only on the retrieved context** to prevent hallucinations.
 
@@ -219,10 +213,10 @@ Optional:
 | Language | TypeScript |
 | Runtime | Node.js |
 | Framework | Express.js |
-| Embeddings | OpenAI text-embedding-ada-002 |
-| LLM | GPT-3.5 Turbo / Gemini |
-| Vector Database | ChromaDB / Supabase pgvector / Qdrant |
-| Data Format | CSV / JSON |
+| Embeddings | Gemini-embedding-001 |
+| LLM |  Gemini 2.0 Flash |
+| Vector Database | ChromaDB |
+| Data Format | JSON |
 | Deployment | Render / Railway |
 
 ---
