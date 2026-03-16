@@ -17,7 +17,7 @@ Do not guess or invent information.`;
 export async function generate(question: string, context: string): Promise<string> {
   try {
     const response = await getClient().models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash-lite',
       contents: `CONTEXT:\n${context}\n\nQUESTION:\n${question}`,
       config: {
         systemInstruction: SYSTEM_PROMPT,

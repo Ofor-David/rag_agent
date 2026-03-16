@@ -86,5 +86,3 @@ export async function ingestKnowledgeBase(): Promise<{
   return { inserted, skipped };
 }
 
-// Run directly when called as a script
-ingestKnowledgeBase().catch(console.error);

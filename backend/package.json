@@ -5,7 +5,8 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "ingest": "node --loader ts-node/esm --no-warnings src/vectordb/ingest.ts",
+    "ingest": "node --loader ts-node/esm --no-warnings src/vectordb/run_ingest.ts", 
+    "listmodels": "node --loader ts-node/esm --no-warnings src/list_models.ts",
     "dev": "nodemon src/server.ts",
     "test": "node src/test.ts",
     "admin": "nodemon src/adminServer.ts",
