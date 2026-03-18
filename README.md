@@ -116,7 +116,7 @@ The system **does not replace official administrative decisions** and will not h
 
 The system follows a **Retrieval-Augmented Generation (RAG)** architecture.
 
-![System Architecture](backend/architecture.png)
+![System Architecture](/public/architecture.png)
 
 ---
 
