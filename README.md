@@ -168,9 +168,9 @@ Embeddings convert text into **numeric vectors** that capture semantic meaning.
 
 ## 4. Vector Storage
 
-Embeddings are stored in ChromaDB
+Embeddings are stored in **Qdrant Cloud** (a vector database service).
 
-This enables **semantic similarity search**.
+This enables **semantic similarity search** — finding answers based on meaning, not just keywords.
 
 ---
 
@@ -213,9 +213,9 @@ Optional:
 | Language | TypeScript |
 | Runtime | Node.js |
 | Framework | Express.js |
-| Embeddings | Gemini-embedding-001 |
-| LLM |  Gemini 2.0 Flash |
-| Vector Database | ChromaDB |
+| Embeddings | gemini-embedding-001 |
+| LLM | gemini-2.5-flash-lite |
+| Vector Database | Qdrant Cloud |
 | Data Format | JSON |
 | Deployment | Render / Railway |
 
@@ -293,10 +293,11 @@ Confirms that the server and vector database are operational.
 # Project Structure
 
 ```
-hod-qa-backend/
-│
+backend/
 ├── src/
 │   ├── server.ts
+│   ├── test.ts
+│   ├── list_models.ts
 │   ├── routes/
 │   │   ├── ask.ts
 │   │   ├── flag.ts
@@ -310,8 +311,12 @@ hod-qa-backend/
 │   │   └── generate.ts
 │   │
 │   ├── vectordb/
-│   │   ├── chroma.ts
-│   │   └── ingest.ts
+│   │   ├── quadrant.ts
+│   │   ├── ingest.ts
+│   │   └── run_ingest.ts
+│   │
+│   ├── middleware/
+│   │   └── adminAuth.ts
 │   │
 │   └── utils/
 │       ├── logger.ts
@@ -322,10 +327,16 @@ hod-qa-backend/
 ├── data/
 │   └── knowledge_base.json
 │
+├── logs/
+│   ├── flags.json
+│   └── query_log.json
+│
 ├── .env
 ├── package.json
 ├── tsconfig.json
 └── README.md
+
+index.html              (frontend, in project root)
 ```
 
 ---

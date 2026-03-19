@@ -84,9 +84,9 @@ ADMIN_API_KEY=your-secret-admin-key
 # Google Gemini — paste your AI Studio key here
 GEMINI_API_KEY=AIza...
 
-# ChromaDB (local)
-CHROMA_URL=http://localhost:8000
-CHROMA_COLLECTION=hod_knowledge_base
+QDRANT_URL=https://3514eb48-9fa4-4909-9e66-bc12bc1c85c6.us-east4-0.gcp.cloud.qdrant.io
+QDRANT_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIiwiZXhwIjoxODQzMDQxNjM2fQ.8fqu4uuS7deCEw5S6aRnLlUFv--KPYJjPKkkVCwscGI
+QDRANT_COLLECTION=hod_knowledge_base
 
 # Pipeline
 TOP_K_RESULTS=3
@@ -96,37 +96,18 @@ Replace `GEMINI_API_KEY` with the key you copied in Step 1.
 
 ---
 
-## 5. Install and start ChromaDB
+## 5. Start ChromaDB (optional — only needed for local development)
 
-ChromaDB is the local vector database. It runs as a separate Python server process.
+If using **Qdrant Cloud** (the default), skip this step.
 
-**Install ChromaDB via pip:**
+For local ChromaDB development instead:
 
 ```bash
 pip install chromadb
+chroma run
 ```
 
-If you are on a system where `pip` points to Python 2, use:
-
-```bash
-pip3 install chromadb
-```
-
-**Start the ChromaDB server:**
-
-```bash
-chroma run --path ./chroma_store
-```
-
-You should see:
-
-```
-Starting Chroma server on http://localhost:8000
-```
-
-Leave this terminal running. Open a new terminal for the remaining steps.
-
-> The `./chroma_store` folder is where ChromaDB persists your vector data. Do not delete it or your ingested knowledge base will be lost and you will need to re-run ingestion.
+Keep this terminal open. ChromaDB will run on port 8000.
 
 ---
 
@@ -239,40 +220,40 @@ curl -X POST http://localhost:3001/api/v1/admin/ingest \
 ## Project structure
 
 ```
-hod-qa-backend/
+backend/
 ├── src/
-│   ├── index.ts                 Express app entry point
+│   ├── server.ts              Express app entry point
+│   ├── test.ts                Manual pipeline test script
+│   ├── list_models.ts         Debug: list available Gemini models
 │   ├── routes/
-│   │   ├── health.ts            GET /api/v1/health
-│   │   ├── flag.ts              POST /api/v1/flag
-│   │   ├── ask.ts               POST /api/v1/ask
-│   │   └── admin.ts             POST /api/v1/admin/*
+│   │   ├── health.ts          GET /api/v1/health
+│   │   ├── flag.ts            POST /api/v1/flag
+│   │   ├── ask.ts             POST /api/v1/ask
+│   │   └── admin.ts           POST /api/v1/admin/*
 │   ├── pipeline/
-│   │   ├── types.ts             Shared TypeScript interfaces
-│   │   ├── preprocess.ts        Step 1 — clean question text
-│   │   ├── embed.ts             Step 2 — Gemini embedding
-│   │   ├── search.ts            Step 3-4 — vector search + context retrieval
-│   │   └── generate.ts          Step 5 — Gemini answer generation
+│   │   ├── preprocess.ts      Step 1 — clean question text
+│   │   ├── embed.ts           Step 2 — Gemini embedding
+│   │   ├── search.ts          Step 3-4 — vector search + context retrieval
+│   │   └── generate.ts        Step 5 — Gemini answer generation
 │   ├── vectordb/
-│   │   ├── chroma.ts            ChromaDB adapter
-│   │   ├── ingest.ts            Ingestion pipeline
-│   │   └── run_ingest.ts        Script entrypoint for npm run ingest
+│   │   ├── quadrant.ts        Qdrant Cloud adapter
+│   │   ├── ingest.ts          Ingestion pipeline (Qdrant)
+│   │   └── run_ingest.ts      Script entrypoint for npm run ingest
 │   ├── middleware/
-│   │   └── adminAuth.ts         X-Admin-Key header check
-│   ├── utils/
-│   │   ├── response.ts          sendError / sendSuccess helpers
-│   │   └── logger.ts            Query logging to logs/query_log.json
-│   └── data/
-│       └── loader.ts            Reads and validates knowledge_base.json
+│   │   └── adminAuth.ts       X-Admin-Key header check
+│   └── utils/
+│       ├── response.ts        sendError / sendSuccess helpers
+│       ├── loader.ts          Reads and validates knowledge_base.json
+│       ├── types.ts           Shared TypeScript interfaces
+│       └── logger.ts          Query logging to logs/query_log.json
 ├── data/
-│   └── knowledge_base.json      Departmental FAQ source data
+│   └── knowledge_base.json     Departmental FAQ source data
 ├── logs/
-│   ├── flags.json               Student-flagged answers (auto-created)
-│   └── query_log.json           All Q&A interactions (auto-created)
-├── chroma_store/                ChromaDB persisted vector data
-├── index.html                   Frontend — open directly in browser
-├── .env                         Environment variables (never commit)
-├── .env.example                 Template for .env
+│   ├── flags.json              Student-flagged answers (auto-created)
+│   └── query_log.json         All Q&A interactions (auto-created)
+├── index.html                  Frontend — open directly in browser
+├── .env                        Environment variables (never commit)
+├── .env.example                Template for .env
 ├── .gitignore
 ├── tsconfig.json
 └── package.json
@@ -284,11 +265,12 @@ hod-qa-backend/
 
 | Script | Command | Description |
 |---|---|---|
-| `npm run dev` | `node --loader ts-node/esm` | Start dev server with hot-ish reload |
+| `npm run dev` | `npx tsx src/server.ts` | Start dev server |
 | `npm run build` | `tsc` | Compile TypeScript to `dist/` |
-| `npm run start` | `node dist/index.js` | Run compiled production build |
-| `npm run ingest` | `ts-node run_ingest.ts` | Ingest knowledge base into ChromaDB |
-| `npm run test` | `ts-node src/test.ts` | Test each pipeline stage individually |
+| `npm run start` | `node dist/server.js` | Run compiled production build |
+| `npm run ingest` | `npx tsx src/vectordb/run_ingest.ts` | Ingest knowledge base into Qdrant |
+| `npm run test` | `npx tsx src/test.ts` | Test each pipeline stage individually |
+| `npm run list-models` | `npx tsx src/list_models.ts` | List available Gemini models |
 
 ---
 
@@ -335,14 +317,8 @@ Your API key was created from Google Cloud Console instead of AI Studio. Go to *
 **`404 — models/text-embedding-004 is not found`**  
 Wrong model name for the current SDK version. The correct model is `gemini-embedding-001`.
 
-**`429 — Quota exceeded`**  
-You have hit the free tier daily limit for the model. Switch to `gemini-2.0-flash-lite` in `generate.ts`, or create a new Google account and generate a fresh AI Studio key.
-
 **`Cannot find module ... /routes/health`**  
 TypeScript module resolution is misconfigured. Make sure `tsconfig.json` has `"module": "NodeNext"` and `"moduleResolution": "NodeNext"`, and all local imports end with `.js`.
-
-**`chroma run: command not found`**  
-ChromaDB was not installed correctly. Run `pip install chromadb` again, or try `pip3 install chromadb`. If still not found, try `python3 -m chromadb.cli run --path ./chroma_store`.
 
 **Page reloads when submitting a question or flag**  
 Add `e.preventDefault()` to the button click handlers in `index.html`.
