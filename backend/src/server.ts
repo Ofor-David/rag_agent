@@ -18,7 +18,7 @@ import healthRouter from './routes/health.ts';
 import flagRouter   from './routes/flag.ts';
 import askRouter, { setVectorDB } from './routes/ask.ts';
 import adminRouter  from './routes/admin.ts';
-import { ChromaDB } from './vectordb/chroma.ts';
+import { QdrantDB } from './vectordb/quadrant.ts';
 
 const app  = express();
 const PORT = process.env.PORT ?? 3001;
@@ -35,7 +35,7 @@ app.use(cors({
 
 // Create the vector database instance and pass it to the ask route
 // This allows the /ask endpoint to search through the knowledge base
-const db = new ChromaDB();
+const db = new QdrantDB();
 setVectorDB(db);
 
 // Connect all routes under /api/v1 prefix

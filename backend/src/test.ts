@@ -37,7 +37,7 @@ async function test() {
   // ── 3. Embedding ────────────────────────────────────────────────────────
   console.log('\n--- 3. EMBEDDING ---');
   const vector = await embed(cleaned);
-  console.log('Vector length:', vector.length);           // should be 1536
+  console.log('Vector length:', vector.length);           // should be 3072
   console.log('First 5 values:', vector.slice(0, 5));     // sanity check
 
   // ── 4. Generation ───────────────────────────────────────────────────────

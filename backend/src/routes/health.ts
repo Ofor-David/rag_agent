@@ -11,11 +11,11 @@
  * Returns: { status: "success", data: { vector_db: "connected", timestamp: "..." } }
  */
 import { Router }  from 'express';
-import { ChromaDB } from '../vectordb/chroma.ts';
+import { QdrantDB } from '../vectordb/quadrant.ts';
 import { sendSuccess } from '../utils/response.ts';
 
 const router = Router();
-const db = new ChromaDB();
+const db = new QdrantDB();
 
 // Health check endpoint - verifies both server and database are working
 router.get('/health', async (_req, res) => {

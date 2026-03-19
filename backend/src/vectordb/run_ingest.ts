@@ -16,6 +16,5 @@
  * with all the questions and answers embedded.
  */
 import 'dotenv/config';
-import { ingestKnowledgeBase } from './ingest.ts';
-
-ingestKnowledgeBase().catch(console.error);
+import { ingestQdrant } from './ingest.ts';
+ingestQdrant().catch(console.error);
