@@ -22,24 +22,24 @@ import { QdrantDB } from './vectordb/quadrant.ts';
 
 const app  = express();
 const PORT = process.env.PORT ?? 3001;
-const cors_origin = process.env.CORS_ORIGIN ?? "*";
 
-// Express needs to parse JSON bodies from requests
-app.use(express.json());
 // CORS lets the frontend (different URL) make requests to this backend
-app.use(cors({
-  origin: ['*'],
+const corsOptions = {
+  origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'X-Admin-Key'],
-  preflightContinue: false,
   optionsSuccessStatus: 204
-}));
+};
+app.use(cors(corsOptions));
 // Explicitly handle OPTIONS preflight for all routes
 
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 // Create the vector database instance and pass it to the ask route
 // This allows the /ask endpoint to search through the knowledge base
+app.use(express.json());
+
 const db = new QdrantDB();
+// Express needs to parse JSON bodies from requests
 setVectorDB(db);
 
 // Connect all routes under /api/v1 prefix
