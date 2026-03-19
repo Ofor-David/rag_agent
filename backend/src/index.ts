@@ -28,11 +28,15 @@ const cors_origin = process.env.CORS_ORIGIN ?? "*";
 app.use(express.json());
 // CORS lets the frontend (different URL) make requests to this backend
 app.use(cors({
-  origin: [cors_origin, 'null'],
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'X-Admin-Key']
+  origin: ['*'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'X-Admin-Key'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
+// Explicitly handle OPTIONS preflight for all routes
 
+app.options('*', cors());
 // Create the vector database instance and pass it to the ask route
 // This allows the /ask endpoint to search through the knowledge base
 const db = new QdrantDB();
